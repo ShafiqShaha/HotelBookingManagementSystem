@@ -600,7 +600,7 @@ pair<double, double> priceMinMax() {
 }
 
 
-// Function to calculate average price
+// Function to calculate average price from file
 double priceAverage() {
     double sum = 0;
     int count = 0;
