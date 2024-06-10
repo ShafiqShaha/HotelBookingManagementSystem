@@ -6,6 +6,7 @@
 #include<ctime>
 #include<sstream>
 #include<iomanip>
+#include <limits>
 
 
 #define MAX_ROOMS 100
@@ -48,6 +49,9 @@ void writeCustomerFileInfo(const Room &room);
 void updateCustomerFileInfo(const Room rooms[], int roomCount);
 void generateBill(const Room &room);
 double calculateBill(const Room &room);
+pair<double, double> priceMinMax();
+double priceAverage();
+void readRooms(Room rooms[], int &count); // Add this line
 void pause();
 
 int main(void)
@@ -72,7 +76,8 @@ int main(void)
         cout << "\t\n 5. ROOM CHECK OUT";
         cout << "\t\n 6. GUEST DETAIL SUMMARY REPORT";
         cout << "\t\n 7. GENERATE BILL";
-        cout << "\t\n 8. SYSTEM EXIT";
+        cout << "\t\n 8. CALCULATE AVARAGE"; //add new mix max
+        cout << "\t\n 9. SYSTEM EXIT";
         cout << "\t\n\n SELECT OPTION: ";
 
         cin >> option;
@@ -177,16 +182,22 @@ int main(void)
                 break;
             //Exiting the system
             case 8:
-                cout << "\n\tCOME AGAIN ANYTIME SOON!"<<endl<<endl;
+            {
+            pair<double, double> priceMinMaxPair = priceMinMax();
+            double averagePrice = priceAverage();
+            cout << "\n\tMinimum price: " << priceMinMaxPair.first 
+                    << "\n\tMaximum price: " << priceMinMaxPair.second 
+                        << "\n\tAverage price: " << averagePrice << endl;
+            }
                 break;
             
-            //keep pop up if the user does not put the correct options number
             default:
                 cout << "\tPlease select the correct option!" << endl;
                 break;
-        }
+        }   
 
-    } while (option != 8);
+
+    } while (option != 9);
 
     return 0;
 }
@@ -546,4 +557,63 @@ void pause() {
     cout << "\n\tPress any key to continue..."<<endl<<endl;
     cin.get();
     cin.ignore();
+}
+
+
+void updateCustomerFile(const Room rooms[], int count) {
+    ofstream file("customers.txt");
+    if (file.is_open()) {
+        for (int i = 0; i < count; ++i) {
+            if (rooms[i].isBooked) {
+                file << "Room Number: " << rooms[i].roomNum << "\n";
+                file << "Customer Name: " << rooms[i].customerInfo.custName << "\n";
+                file << "Address: " << rooms[i].customerInfo.custAddress << "\n";
+                file << "Phone: " << rooms[i].customerInfo.custPhoneNum << "\n";
+                file << "From Date: " << rooms[i].customerInfo.bookingStartFromDate << "\n";
+                file << "To Date: " << rooms[i].customerInfo.bookingEndDate << "\n";
+                file << "Advance Payment: " << rooms[i].customerInfo.advancePay << "\n";
+                file << "---------------------------------------\n";
+            }
+        }
+    }
+    file.close();
+}
+
+// Function to calculate minimum and maximum prices
+pair<double, double> priceMinMax() {
+    double minPrice = numeric_limits<double>::max();
+    double maxPrice = numeric_limits<double>::min();
+    double price;
+    ifstream file("customers.txt");
+    string line;
+    while (getline(file, line)) {
+        if (line.find("Advance Payment: ") != string::npos) {
+            price = stod(line.substr(line.find(": ") + 2));
+            if (price < minPrice)
+                minPrice = price;
+            if (price > maxPrice)
+                maxPrice = price;
+        }
+    }
+    file.close();
+    return make_pair(minPrice, maxPrice); // Return a pair of minPrice and maxPrice
+}
+
+
+// Function to calculate average price
+double priceAverage() {
+    double sum = 0;
+    int count = 0;
+    double price;
+    ifstream file("customers.txt");
+    string line;
+    while (getline(file, line)) {
+        if (line.find("Advance Payment: ") != string::npos) {
+            price = stod(line.substr(line.find(": ") + 2));
+            sum += price;
+            count++;
+        }
+    }
+    file.close();
+    return (count == 0) ? 0 : sum / count;
 }
