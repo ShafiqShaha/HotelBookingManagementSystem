@@ -1,0 +1,26 @@
+Customer Name: syukri
+Customer Address: sdnasdmasd
+Customer Phone Number: 0123123321
+Booking Number: 1041
+Booking From: 2024-06-19
+Booking To: 2024-06-25
+Advance Payment: RM50
+Room Number: 101
+Room Type: T
+Room Size: N
+Bed Size: S
+Room Rate: RM550
+=================================================================================
+Customer Name: zul
+Customer Address: mckskdfksdf
+Customer Phone Number: 0123123142
+Booking Number: 1467
+Booking From: 2024-06-19
+Booking To: 2024-06-21
+Advance Payment: RM400
+Room Number: 102
+Room Type: T
+Room Size: N
+Bed Size: S
+Room Rate: RM550
+=================================================================================

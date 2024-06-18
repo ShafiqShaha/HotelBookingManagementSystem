@@ -65,8 +65,8 @@ void writeCustomerFileInfo(const Room &room);
 void updateCustomerFileInfo(const Room rooms[], int roomCount);
 void generateBill(const Room &room);
 double calculateBill(const Room &room);
-pair<double, double> priceMinMax(const Room rooms[], int roomCount);
-double priceAverage(const Room rooms[], int roomCount);
+pair<double, double> priceMinMax();
+double priceAverage();
 void readRooms(Room rooms[], int &roomCount); // Read the room data
 void saveRooms(Room rooms[], int roomCount); // Save the room data
 void readCustomers(Customer customers[], int &count); //load the customer data
@@ -95,7 +95,7 @@ int main(void)
         cout << "\t\n 5. ROOM CHECK OUT";
         cout << "\t\n 6. GUEST DETAIL SUMMARY REPORT";
         cout << "\t\n 7. GENERATE BILL";
-        cout << "\t\n 8. CALCULATE AVERAGE"; 
+        cout << "\t\n 8. CALCULATE AVERAGE"; //add new mix max
         cout << "\t\n 9. SYSTEM EXIT";
         cout << "\t\n\n SELECT OPTION: ";
 
@@ -203,24 +203,16 @@ int main(void)
                 }
                 break;
             //Exiting the system
-case 8:
-    if (roomCount == 0)
-    {
-        cout << "\n\tNo rooms are available at the moment!";
-    }
-    else
-    {
-        pair<double, double> minMax = priceMinMax(rooms, roomCount);
-        double minPrice = minMax.first;
-        double maxPrice = minMax.second;
-        double avgPrice = priceAverage(rooms, roomCount);
-
-        cout << "Minimum Room Rate: RM" << minPrice << endl;
-        cout << "Maximum Room Rate: RM" << maxPrice << endl;
-        cout << "Average Room Rate: RM" << avgPrice << endl;
-    }
-    pause();
-    break;
+            case 8:
+            {
+            pair<double, double> priceMinMaxPair = priceMinMax();
+            double averagePrice = priceAverage();
+            cout << "\n\tMinimum price: " << priceMinMaxPair.first 
+                    << "\n\tMaximum price: " << priceMinMaxPair.second 
+                        << "\n\tAverage price: " << averagePrice << endl;
+            }
+                break;
+            
             //Exiting the system
             case 9:
                 cout << "\n\tCOME AGAIN ANYTIME SOON!"<<endl<<endl;
@@ -240,31 +232,12 @@ case 8:
 Room addRoomNumber(int roomNumber) {
     Room room;
     room.roomNum = roomNumber;
-    double roomPrice;
-        system("cls");
-    cout << "=================================================================================" << endl;
-    cout << "||                          Add Room Number Information                        ||" << endl;
-    cout << "=================================================================================" << endl << endl;
-    cout << "                               Room View Type                                    " << endl;
-    cout << "        Tower View = RM550.0 / Garden View = RM500.0/ Water Chalet = RM600.0     " << endl;
-    cout << "                               Room Size Type                                    " << endl;
-    cout << "    Normal = no additional prices / Deluxe = +RM100.0/ Presidential = +RM200.0   " << endl;
-    cout << "                               Bed Size Type                                     " << endl;
-    cout << "       Single = no additional prices/ Queen = +RM50.0/ King = +RM100.0           " << endl;
+
     do {
         cout << "\n\tRoom Type information (Tower View/Garden View/Water Chalet)(T/G/W): ";
         cin >> room.roomType;
         if (!isValidRoomType(room.roomType)){
             cout << "\n\tInvalid room type! Please enter T, G, or W only.";
-        }
-        else if (room.roomType == 'T') {
-            roomPrice = 550.0;
-        }
-        else if (room.roomType == 'G') {
-            roomPrice = 500.0;
-        }
-        else {
-            roomPrice = 600.0;
         }
     } while (!isValidRoomType(room.roomType));
 
@@ -273,12 +246,6 @@ Room addRoomNumber(int roomNumber) {
         cin >> room.roomSize;
         if(!isValidRoomSize(room.roomSize)){
             cout << "\n\tInvalid room size! Please enter N, D, or P only.";
-        }
-        else if (room.roomSize == 'D') {
-            roomPrice += 100.0;
-        }
-        else if (room.roomSize == 'P') {
-            roomPrice += 200.0;
         }
     } while(!isValidRoomSize(room.roomSize));
 
@@ -289,19 +256,13 @@ Room addRoomNumber(int roomNumber) {
         {
             cout << "\n\tInvalid bed type! Please enter S, Q, or K only.";
         }
-        else if (room.bedType == 'Q') {
-            roomPrice += 50.0;
-        }
-        else if (room.bedType == 'K') {
-            roomPrice += 100.0;
-        }
     } while(!isValidBedType(room.bedType));
 
-    room.roomRate = roomPrice;
+    cout << "\n\tRoom rate per night: ";
+    cin >> room.roomRate;
     room.isBooked = false;
  
     cout << "\n\tThe Room has been added successfully!" << endl<<endl;
-    cout << "\t\tPress'Enter' to main menu" << endl;
     cin.ignore();
 
     pause();
@@ -385,7 +346,6 @@ void roomCheckIn(Room rooms[], int roomCount) {
 
             cout << "\n\tThe Customer has been checked in successfully!";
             pause();
-            system("cls");
             return;
         }
     }
@@ -419,7 +379,6 @@ void getAvailableRoom(const Room rooms[], int roomCount) {
         cout << "\n\tNo available rooms found!";
     }
     pause();
-    system("cls");
 }
 
 //Function to manage room addition and deletion
@@ -502,13 +461,11 @@ void roomCheckOut(Room rooms[], int roomCount, int roomNumber) {
 
             cout << "\n\tThe Customer has been checked out successfully!";
             pause();
-            system("cls");
             return;
         }
     }
     cout << "\n\tSorry, the room number you are searching for is not found!";
     pause();
-    system("cls");
 }
 
 //function to search customer information
@@ -524,7 +481,6 @@ void searchCustomerInfo(const Room rooms[], int roomCount, const string &name) {
             cout << "\n\tBooking To: " << rooms[room].customerInfo.bookingEndDate;
             cout << "\n\tAdvance Payment: RM" << rooms[room].customerInfo.advancePay;
             pause();
-            system("cls");
             return;
         }
     }
@@ -546,12 +502,28 @@ double calculateBill(const Room &room) {
     time_t endTime = mktime(&endDate);
 
     daysStayed = difftime(endTime, startTime) / (24 * 60 * 60) + 1; // Add 1 to include the check-in day
-    
 
     double bill = daysStayed * room.roomRate - room.customerInfo.advancePay;
     return bill > 0 ? bill : 0; // Ensure the bill is not negative
 }
+/* 
+double calculateBill(const Room &room) {
+    int daysStayed;
 
+    tm startDate = {};
+    istringstream(room.customerInfo.bookingStartFromDate) >> get_time(&startDate , "%Y-%m-%d");
+    time_t startTime = mktime(&startDate);
+
+    tm endDate = {};
+    istringstream(room.customerInfo.bookingEndDate) >> get_time(&endDate, "%Y-%m-%d");
+    time_t endTime = mktime(&endDate);
+
+    daysStayed = difftime(endTime, startTime) / (24 * 60 * 60);
+
+    double bill = daysStayed * room.roomRate;
+    return bill;
+}
+ */
 void generateBill(const Room &room) {
     if (room.isBooked) {
         double bill = calculateBill(room);
@@ -588,8 +560,8 @@ void customerSummaryReport(const Room rooms[], int roomCount) {
         }
     }
     pause();
-    system("cls");
 }
+
 //Function to write customer information to a file
 void writeCustomerFileInfo(const Room &room) {
     ofstream file("customerInfo.txt", ios::app);
@@ -615,7 +587,6 @@ void writeCustomerFileInfo(const Room &room) {
     {
         cout << "\n\tUnable to open the file to write!";
     }
-    system("cls");
 }
 
 //Function to update customer information in a file
@@ -656,6 +627,65 @@ void pause() {
     cout << "\n\t\tPress any key to continue..."<<endl<<endl;
     cin.get();
     cin.ignore();
+}
+
+
+/* void updateCustomerFile(const Room rooms[], int count) {
+    ofstream file("customers.txt"); // changes to customerInfo.txt
+    if (file.is_open()) {
+        for (int i = 0; i < count; ++i) {
+            if (rooms[i].isBooked) {
+                file << "Room Number: " << rooms[i].roomNum << "\n";
+                file << "Customer Name: " << rooms[i].customerInfo.custName << "\n";
+                file << "Address: " << rooms[i].customerInfo.custAddress << "\n";
+                file << "Phone: " << rooms[i].customerInfo.custPhoneNum << "\n";
+                file << "From Date: " << rooms[i].customerInfo.bookingStartFromDate << "\n";
+                file << "To Date: " << rooms[i].customerInfo.bookingEndDate << "\n";
+                file << "Advance Payment: " << rooms[i].customerInfo.advancePay << "\n";
+                file << "---------------------------------------\n";
+            }
+        }
+    }
+    file.close();
+}
+ */
+// Function to calculate minimum and maximum prices
+pair<double, double> priceMinMax() {
+    double minPrice = numeric_limits<double>::max();
+    double maxPrice = numeric_limits<double>::min();
+    double price;
+    ifstream file("customersInfo.txt");
+    string line;
+    while (getline(file, line)) {
+        if (line.find("Advance Payment: ") != string::npos) {
+            price = stod(line.substr(line.find(": ") + 2));
+            if (price < minPrice)
+                minPrice = price;
+            if (price > maxPrice)
+                maxPrice = price;
+        }
+    }
+    file.close();
+    return make_pair(minPrice, maxPrice); // Return a pair of minPrice and maxPrice
+}
+
+
+// Function to calculate average price from file
+double priceAverage() {
+    double sum = 0;
+    int count = 0;
+    double price;
+    ifstream file("customersInfo.txt");
+    string line;
+    while (getline(file, line)) {
+        if (line.find("Advance Payment: ") != string::npos) {
+            price = stod(line.substr(line.find(": ") + 2));
+            sum += price;
+            count++;
+        }
+    }
+    file.close();
+    return (count == 0) ? 0 : sum / count;
 }
 
 // load the readRooms function
@@ -719,38 +749,4 @@ void readCustomers(Customer customers[], int &count) {
     }
 
     inFile.close();
-}
-
-// Function definitions
-pair<double, double> priceMinMax(const Room rooms[], int roomCount) {
-    double minPrice = numeric_limits<double>::max();
-    double maxPrice = numeric_limits<double>::lowest();
-
-    for (int i = 0; i < roomCount; ++i) {
-        if (rooms[i].isBooked) {
-            double roomRate = rooms[i].roomRate;
-            minPrice = min(minPrice, roomRate);
-            maxPrice = max(maxPrice, roomRate);
-        }
-    }
-
-    return make_pair(minPrice, maxPrice);
-}
-
-double priceAverage(const Room rooms[], int roomCount) {
-    double totalPrice = 0.0;
-    int bookedRoomCount = 0;
-
-    for (int i = 0; i < roomCount; ++i) {
-        if (rooms[i].isBooked) {
-            totalPrice += rooms[i].roomRate;
-            bookedRoomCount++;
-        }
-    }
-
-    if (bookedRoomCount > 0) {
-        return totalPrice / bookedRoomCount;
-    } else {
-        return 0.0; // No booked rooms, return 0 as the average
-    }
 }

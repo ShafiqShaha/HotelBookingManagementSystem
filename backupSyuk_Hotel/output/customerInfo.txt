@@ -1,0 +1,26 @@
+Customer Name: syuk
+Customer Address: sdajda
+Customer Phone Number: asdjads
+Booking Number: 1041
+Booking From: 2024-06-16
+Booking To: 2024-06-20
+Advance Payment: RM100
+Room Number: 101
+Room Type: G
+Room Size: N
+Bed Size: S
+Room Rate: RM150
+=================================================================================
+Customer Name: ayam
+Customer Address: sadjkads
+Customer Phone Number: nkasdknasd
+Booking Number: 1467
+Booking From: 2024-06-17
+Booking To: 2024-06-18
+Advance Payment: RM40
+Room Number: 102
+Room Type: W
+Room Size: P
+Bed Size: S
+Room Rate: RM200
+=================================================================================
